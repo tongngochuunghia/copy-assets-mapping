@@ -33,6 +33,7 @@ root
 +-- public
 |   |-- .gitignore
 |
+|-- mapping.json
 |-- package.json
 |-- README.md
 ```
@@ -74,6 +75,7 @@ root
 |   |
 |   |-- .gitignore
 |
+|-- mapping.json
 |-- package.json
 |-- README.md
 ```

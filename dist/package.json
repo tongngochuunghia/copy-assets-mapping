@@ -1,0 +1,50 @@
+{
+    "name": "copy-assets-mapping",
+    "version": "v1.0.1",
+    "description": "Copy the plugins folder to assets folder.",
+    "main": "bin/cli.js",
+    "bin": {
+        "copy-assets-mapping": "bin/cli.js"
+    },
+    "scripts": {
+        "start": "node ./dist/src/index",
+        "clean": "shx rm -rf ./dist/* && shx rm -rf ./public",
+        "build": "npm run clean && tsc --build tsconfig.json",
+        "copy-assets": "ts-node ./src/index",
+        "copy-assets-debug": "node --inspect -r ts-node/register ./src/index",
+        "eslint": "eslint --config ./.eslintrc.js --fix ./src/**/*.ts",
+        "test": "node ./dist/src/index mappingPath=./mapping.json"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tongngochuunghia/copy-assets-mapping-private.git"
+    },
+    "author": "Nghia, Tong Ngoc Huu <tongngochuunghia@gmail.com>",
+    "license": "MIT",
+    "keywords": [
+        "copy",
+        "assets",
+        "copy-assets",
+        "copy-assets-mapping"
+    ],
+    "dependencies": {
+        "chalk": "^4.0.0",
+        "fs-extra": "^9.0.0"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^8.1.0",
+        "@typescript-eslint/eslint-plugin": "^2.32.0",
+        "@typescript-eslint/parser": "^2.32.0",
+        "eslint": "^7.0.0",
+        "eslint-config-standard": "^14.1.1",
+        "eslint-plugin-import": "^2.20.2",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-promise": "^4.2.1",
+        "eslint-plugin-sort-imports-es6-autofix": "^0.5.0",
+        "eslint-plugin-standard": "^4.0.1",
+        "json-schema": "^0.2.5",
+        "shx": "^0.3.2",
+        "ts-node": "^8.10.1",
+        "typescript": "^3.8.3"
+    }
+}
