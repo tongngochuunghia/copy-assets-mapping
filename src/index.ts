@@ -35,15 +35,18 @@ const isNullOrEmpty = (value: any): value is undefined | boolean => {
 const getConfig = (): IConfig => {
     const params: IConfig = {} as any;
     const args: string[] = process.argv;
+    if (__DEV__) {
+        console.log("#getConfig", args);
+    }
     for (const param of args) {
         const split: string[] = param.split(/=/g);
         (params as any)[split[0]] = (split.length > 1) ? split[1] : "";
     }
-    if (!isNullOrEmpty(params.mappingPath)) {
+    if (isNullOrEmpty(params.mappingPath)) {
         params.mappingPath = "./mapping.json";
     }
     if (__DEV__) {
-        console.log(`#getConfig: params=${JSON.stringify(params)}`);
+        console.log("#getConfig: params=", params);
     }
     return params;
 };
@@ -81,21 +84,21 @@ export default ((): void => {
     console.log(chalk.yellow(`${name} (Version ${version} - ${author})`));
 
     const config = getConfig();
-    try {
-        const absolutePath = path.resolve(config.mappingPath);
-        if (fse.existsSync(absolutePath)) {
-            // fse.readFileSync
-            const fileData = fse.readFileSync(absolutePath, { encoding: "utf8" });
-            const mappingArray: IMappingItem[] = JSON.parse(fileData);
-            (mappingArray || []).forEach(({ from, to }) => {
-                copyPluginItem(from, to);
-            });
-        } else {
-            console.log(`  - ${chalk.yellow("File or folder")} ${chalk.green("absolutePath")} ${chalk.yellow("not found.")}`);
-        }
-        console.log(chalk.green("Completed."));
-    } catch (error) {
-        console.log(chalk.red("Copying error:"));
-        console.error(error);
-    }
+    // try {
+    //     const absolutePath = path.resolve(config.mappingPath);
+    //     if (fse.existsSync(absolutePath)) {
+    //         // fse.readFileSync
+    //         const fileData = fse.readFileSync(absolutePath, { encoding: "utf8" });
+    //         const mappingArray: IMappingItem[] = JSON.parse(fileData);
+    //         (mappingArray || []).forEach(({ from, to }) => {
+    //             copyPluginItem(from, to);
+    //         });
+    //     } else {
+    //         console.log(`  - ${chalk.yellow("File or folder")} ${chalk.green("absolutePath")} ${chalk.yellow("not found.")}`);
+    //     }
+    //     console.log(chalk.green("Completed."));
+    // } catch (error) {
+    //     console.log(chalk.red("Copying error:"));
+    //     console.error(error);
+    // }
 })();

@@ -1,6 +1,6 @@
 {
     "name": "copy-assets-mapping",
-    "version": "v1.0.1",
+    "version": "v1.0.2",
     "description": "Copy the plugins folder to assets folder.",
     "main": "bin/cli.js",
     "bin": {
@@ -8,10 +8,9 @@
     },
     "scripts": {
         "start": "node ./dist/src/index",
+        "dev": "node --inspect -r ts-node/register ./src/index",
         "clean": "shx rm -rf ./dist/* && shx rm -rf ./public",
         "build": "npm run clean && tsc --build tsconfig.json",
-        "copy-assets": "ts-node ./src/index",
-        "copy-assets-debug": "node --inspect -r ts-node/register ./src/index",
         "eslint": "eslint --config ./.eslintrc.js --fix ./src/**/*.ts",
         "test": "node ./dist/src/index mappingPath=./mapping.json"
     },
