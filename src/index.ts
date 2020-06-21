@@ -84,21 +84,21 @@ export default ((): void => {
     console.log(chalk.yellow(`${name} (Version ${version} - ${author})`));
 
     const config = getConfig();
-    // try {
-    //     const absolutePath = path.resolve(config.mappingPath);
-    //     if (fse.existsSync(absolutePath)) {
-    //         // fse.readFileSync
-    //         const fileData = fse.readFileSync(absolutePath, { encoding: "utf8" });
-    //         const mappingArray: IMappingItem[] = JSON.parse(fileData);
-    //         (mappingArray || []).forEach(({ from, to }) => {
-    //             copyPluginItem(from, to);
-    //         });
-    //     } else {
-    //         console.log(`  - ${chalk.yellow("File or folder")} ${chalk.green("absolutePath")} ${chalk.yellow("not found.")}`);
-    //     }
-    //     console.log(chalk.green("Completed."));
-    // } catch (error) {
-    //     console.log(chalk.red("Copying error:"));
-    //     console.error(error);
-    // }
+    try {
+        const absolutePath = path.resolve(config.mappingPath);
+        if (fse.existsSync(absolutePath)) {
+            // fse.readFileSync
+            const fileData = fse.readFileSync(absolutePath, { encoding: "utf8" });
+            const mappingArray: IMappingItem[] = JSON.parse(fileData);
+            (mappingArray || []).forEach(({ from, to }) => {
+                copyPluginItem(from, to);
+            });
+        } else {
+            console.log(`  - ${chalk.yellow("File or folder")} ${chalk.green("absolutePath")} ${chalk.yellow("not found.")}`);
+        }
+        console.log(chalk.green("Completed."));
+    } catch (error) {
+        console.log(chalk.red("Copying error:"));
+        console.error(error);
+    }
 })();

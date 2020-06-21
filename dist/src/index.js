@@ -50,4 +50,23 @@ var copyPluginItem = function (from, to) {
 exports.default = (function () {
     console.log(chalk_1.default.yellow(package_json_1.name + " (Version " + package_json_1.version + " - " + package_json_1.author + ")"));
     var config = getConfig();
+    try {
+        var absolutePath = path_1.default.resolve(config.mappingPath);
+        if (fs_extra_1.default.existsSync(absolutePath)) {
+            var fileData = fs_extra_1.default.readFileSync(absolutePath, { encoding: "utf8" });
+            var mappingArray = JSON.parse(fileData);
+            (mappingArray || []).forEach(function (_a) {
+                var from = _a.from, to = _a.to;
+                copyPluginItem(from, to);
+            });
+        }
+        else {
+            console.log("  - " + chalk_1.default.yellow("File or folder") + " " + chalk_1.default.green("absolutePath") + " " + chalk_1.default.yellow("not found."));
+        }
+        console.log(chalk_1.default.green("Completed."));
+    }
+    catch (error) {
+        console.log(chalk_1.default.red("Copying error:"));
+        console.error(error);
+    }
 })();

@@ -1,6 +1,6 @@
 {
   "name": "copy-assets-mapping",
-  "version": "v1.0.2",
+  "version": "v1.0.3",
   "description": "Copy the plugins folder to assets folder.",
   "main": "bin/cli.js",
   "bin": {
