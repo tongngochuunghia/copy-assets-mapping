@@ -95,10 +95,11 @@ yarn add https://github.com/tongngochuunghia/copy-assets-mapping.git
 Open `package.json` and add the following `scripts`:
 ```bash
 "scripts": {
-  "copy-assets": "copy-assets-mapping mappingPath=./mapping.json"
+  "copy-assets": "copy-assets-mapping --mapping=./mapping.json"
 }
 ```
-- `mappingPath`: The file mapping config with json format, default `./mapping.json`
+- `--mapping`: The file mapping config with json format, default `./mapping.json`
+- `--debug`: Enabled debug mode, default `false`
 ```json
 [
   {
