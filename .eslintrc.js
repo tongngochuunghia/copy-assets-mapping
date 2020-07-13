@@ -31,7 +31,7 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": ["warn", { vars: "all", args: "after-used", ignoreRestSiblings: false }],
         "no-unused-vars": ["warn", { vars: "all", args: "after-used", ignoreRestSiblings: false }],
         "space-before-function-paren": "off",
-        indent: ["warn", 4],
+        indent: ["warn", 4, { SwitchCase: 1 }],
         quotes: ["warn", "double"],
         semi: ["error", "always"]
     }

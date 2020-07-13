@@ -1,6 +1,6 @@
 [
-    {
-      "from": "test",
-      "to": "public/test"
-    }
-  ]
+  {
+    "from": "test",
+    "to": "public/test"
+  }
+]

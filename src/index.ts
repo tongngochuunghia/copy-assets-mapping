@@ -1,10 +1,12 @@
 import fse from "fs-extra";
 import path from "path";
 import chalk from "chalk";
+import commandLineArgs, { CommandLineOptions } from "command-line-args";
 import { author, name, version } from "../package.json";
 
-export interface IConfig {
-    mappingPath: string;
+export interface IOptions extends CommandLineOptions {
+    mapping: string;
+    debug: boolean;
 }
 
 export interface IMappingItem {
@@ -13,42 +15,30 @@ export interface IMappingItem {
 }
 
 /**
- * Debug flag.
+ * Command options
  */
-const __DEV__ = false;
+let options: IOptions;
 
 /**
- * Check Object is null or String null or empty.
- *
- * @param {object | string} value Object or String
- * @returns if null or empty return true, otherwise return false.
+ * Logger
  */
-const isNullOrEmpty = (value: any): value is undefined | boolean => {
-    return value === undefined || value === null || value === "";
-};
-
-/**
- * Read and parse params from command line args.
- *
- * @see https://stackoverflow.com/questions/4351521/how-do-i-pass-command-line-arguments-to-a-node-js-program
- */
-const getConfig = (): IConfig => {
-    const params: IConfig = {} as any;
-    const args: string[] = process.argv;
-    if (__DEV__) {
-        console.log("#getConfig", args);
+const logger = {
+    info: console.log,
+    error: console.error,
+    debug: (message?: any, ...params: any[]): void => {
+        if (options && options.debug) {
+            const length = params.length;
+            switch (length) {
+                case 0: return console.debug(message);
+                case 1: return console.debug(message, params[0]);
+                case 2: return console.debug(message, params[0], params[1]);
+                case 3: return console.debug(message, params[0], params[1], params[2]);
+                case 4: return console.debug(message, params[0], params[1], params[2], params[3]);
+                case 5: return console.debug(message, params[0], params[1], params[2], params[3], params[4]);
+                default: return console.debug(message, params.join(" "));
+            }
+        }
     }
-    for (const param of args) {
-        const split: string[] = param.split(/=/g);
-        (params as any)[split[0]] = (split.length > 1) ? split[1] : "";
-    }
-    if (isNullOrEmpty(params.mappingPath)) {
-        params.mappingPath = "./mapping.json";
-    }
-    if (__DEV__) {
-        console.log("#getConfig: params=", params);
-    }
-    return params;
 };
 
 /**
@@ -62,17 +52,22 @@ const copyPluginItem = (from: string, to: string): void => {
         // create dir to if not exist
         fse.ensureDirSync(path.dirname(to));
         const fromPath = fse.existsSync(from) ? from : from.replace("node_modules/", "../");
+
+        const absoluteFromPath = path.resolve(fromPath);
+        const absoluteToPath = path.resolve(to);
+        logger.debug("%s - [debug]: Copying from %s to %s", new Date().toISOString(), chalk.gray(absoluteFromPath), chalk.gray(absoluteToPath));
+
         if (fse.statSync(from).isDirectory()) {
             // copy dir
             fse.copySync(fromPath, to);
-            console.log(`  - [Folder] ${chalk.gray(from)} ${chalk.green("successfully")} copied to ${chalk.gray(to)}.`);
+            logger.info(`  - [Folder] ${chalk.gray(from)} ${chalk.green("successfully")} copied to ${chalk.gray(to)}`);
         } else {
             // copy file
             fse.copyFileSync(fromPath, to);
-            console.log(`  - [File]   ${chalk.gray(from)} ${chalk.green("successfully")} copied to ${chalk.gray(to)}.`);
+            logger.info(`  - [File]   ${chalk.gray(from)} ${chalk.green("successfully")} copied to ${chalk.gray(to)}`);
         }
-    } catch (error) {
-        console.log(`  >>> Copy ${chalk.gray(from)} ${chalk.red("failed")}. ${error}`);
+    } catch (err) {
+        logger.info(`  >>> Copy ${chalk.gray(from)} ${chalk.red("failed")}. ${err}`);
     }
 };
 
@@ -81,24 +76,36 @@ const copyPluginItem = (from: string, to: string): void => {
  */
 export default ((): void => {
     // Write log module info
-    console.log(chalk.yellow(`${name} (Version ${version} - ${author})`));
+    logger.info(chalk.yellow(`${name} (Version ${version} - ${author})`));
 
-    const config = getConfig();
+    // https://github.com/75lb/command-line-args
+    options = commandLineArgs([
+        { name: "mapping", alias: "m", type: String, defaultValue: "./mapping.json" },
+        { name: "debug", alias: "d", type: Boolean, defaultValue: false }
+    ]) as any;
+
+    // Log options
+    logger.debug("%s - [debug]: options=%s", new Date().toISOString(), JSON.stringify(options));
+
     try {
-        const absolutePath = path.resolve(config.mappingPath);
+        const absolutePath = path.resolve(options.mapping);
+        logger.debug("%s - [debug]: mappingPath=%s", new Date().toISOString(), absolutePath);
+
         if (fse.existsSync(absolutePath)) {
-            // fse.readFileSync
-            const fileData = fse.readFileSync(absolutePath, { encoding: "utf8" });
-            const mappingArray: IMappingItem[] = JSON.parse(fileData);
+            const mappingData = fse.readFileSync(absolutePath, { encoding: "utf8" });
+            logger.debug("%s - [debug]: rawData=%s", new Date().toISOString(), mappingData);
+
+            const mappingArray: IMappingItem[] = JSON.parse(mappingData);
+            logger.debug("%s - [debug]: mappingData=%s", new Date().toISOString(), JSON.stringify(mappingArray));
+
             (mappingArray || []).forEach(({ from, to }) => {
                 copyPluginItem(from, to);
             });
         } else {
-            console.log(`  - ${chalk.yellow("File or folder")} ${chalk.green("absolutePath")} ${chalk.yellow("not found.")}`);
+            logger.info(`  - ${chalk.yellow("File or folder")} ${chalk.green("absolutePath")} ${chalk.yellow("not found")}`);
         }
-        console.log(chalk.green("Completed."));
-    } catch (error) {
-        console.log(chalk.red("Copying error:"));
-        console.error(error);
+        logger.info(chalk.green("Completed."));
+    } catch (err) {
+        logger.error(chalk.red("Copying error:"), err);
     }
 })();
